@@ -1,9 +1,9 @@
 class Game < ApplicationRecord
   belongs_to :user
 
-  has_many :game_users
-  has_many :game_words
-  has_many :game_teams
+  has_many :game_users, dependent: :destroy
+  has_many :game_words, dependent: :destroy
+  has_many :game_teams, dependent: :destroy
 
   validates :key_number, uniqueness: true
   # enum round: { describe: 1, mime: 2, one_word: 3 }

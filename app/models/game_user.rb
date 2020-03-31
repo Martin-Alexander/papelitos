@@ -5,7 +5,7 @@ class GameUser < ApplicationRecord
 
   validates_uniqueness_of :user, :scope => [:game]
 
-  before_save :set_order
+  before_create :set_order
 
   def set_order
     # For all teammates, order them by 'order', and select the last one

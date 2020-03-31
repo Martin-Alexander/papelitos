@@ -11,6 +11,7 @@ const teamOnePoints  = document.querySelector('#team-1-points');
 const teamTwoPoints  = document.querySelector('#team-2-points');
 const roundName      = document.querySelector('#round-name');
 const gameState      = document.getElementById('game-state');
+const skipButton     = document.getElementById('skip-button');
 
 if (gameState) {
   const gameId = gameState.dataset.gameId;
@@ -46,14 +47,58 @@ if (gameState) {
     });
   }, 1000);
 
+  // first word is the first one in the array
   currentWord.innerHTML = gameWords[0];
 
-  if (increaseScrore) {
-    increaseScrore.addEventListener('click', () => {
-      if (gameWords.length > 0) {
-        const completedWord = gameWords.shift();
-        const nextWord = gameWords[0];
-        
+  increaseScrore.addEventListener('click', () => {
+    if (gameWords.length > 0) {
+      gameWords.shift(); // remove the last word from the array (`unshift` removes the element at the start of the array)
+      const nextWord = gameWords[0]; // the next word is the next first one
+      const roundOver = nextWord === undefined // if there is no next word then that means the round is over
+
+      fetch(`/game_teams/${gameTeamId}`, {
+        method : 'PATCH',
+        headers: {
+          'X-CSRF_TOKEN': csrfToken(),
+          credentials   : 'same-origin',
+          Accept        : 'application/json',
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          roundOver: roundOver,
+          givePoint: true
+        })
+      });
+
+      if (nextWord) {
+        // if there is a next word display it
+        currentWord.innerHTML = nextWord;
+      } else {
+        // if there isn't (that means the rounds over)...
+        // swap displays so that they player sees the 'non-player' view
+        activePlayer.style.display = "none";
+        inactivePlayer.style.display = "initial";
+
+        // and reset their words for next time
+        gameWords = JSON.parse(gameState.dataset.gameWords);
+        currentWord.innerHTML = gameWords[0];
+      }
+    }
+  });
+
+  skipButton.addEventListener('click', () => {
+    // if they clicked skip it's the same logic for going to the next word
+    if (gameWords.length > 0) {
+      gameWords.shift();
+      const nextWord = gameWords[0];
+
+      if (nextWord) {
+        currentWord.innerHTML = nextWord;
+      } else {
+        // if that was the last word, we need to tell the server that we should go to the next round
+        activePlayer.style.display = "none";
+        inactivePlayer.style.display = "initial";
+
         fetch(`/game_teams/${gameTeamId}`, {
           method : 'PATCH',
           headers: {
@@ -63,21 +108,15 @@ if (gameState) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            roundOver: nextWord === undefined,
-            completedWord: completedWord
+            roundOver: true,
+            givePoint: false // telling the server that they shouldn't get a point
           })
         });
 
-        if (nextWord) {
-          currentWord.innerHTML = nextWord;
-        } else {
-          activePlayer.style.display = "none";
-          inactivePlayer.style.display = "initial";
-          gameWords = JSON.parse(gameState.dataset.gameWords);
-          currentWord.innerHTML = gameWords[0];
-        }
+        gameWords = JSON.parse(gameState.dataset.gameWords);
+        currentWord.innerHTML = gameWords[0];
       }
-    });
-  }
+    }
+  });
 }
 

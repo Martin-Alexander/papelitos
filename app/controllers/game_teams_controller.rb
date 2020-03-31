@@ -1,8 +1,10 @@
 class GameTeamsController < ApplicationController
   def update
     @game_team = GameTeam.find(params[:id])
-    @game_team.score += 1
-    @game_team.save
-    # redirect_to game_path(@game_team.game)
+    @game_team.update(score: @game_team.score + 1)
+
+    if params[:roundOver]
+      @game_team.game.next_round!
+    end
   end
 end

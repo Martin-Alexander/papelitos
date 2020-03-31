@@ -20,4 +20,4 @@ GameWord.create(name: "Butterfly",           game: game)
 GameWord.create(name: "Areoplane",           game: game)
 GameWord.create(name: "Chocolate Cookie",    game: game)
 
-puts "Game ready at localhost:3002/games/#{game.id}"
+puts "Game ready at localhost:3000/games/#{game.id}"

@@ -11,18 +11,18 @@
 <p>Team playing: <span id="team-playing"></span></p>
 
 <!-- content shows if current user play -->
-<% if @game.game_users.first.user_id == current_user.id %>
+<div id="active-player" style="display: <%= @playing_user == current_user ? "initial" : "none" %>;">
   <p>Current Word: <span id="current-word"></span></p>
-  <p>You are playing <span id="you-are-playing"></span></p>
 
   <button class="buttons join-button" id="increase-score">Got it! +1</button>
   <button class="buttons join-button hide hide_button" id="change_user">Next Player</button>
-<% else %>
+</div>
+
 <!-- what every other players sees -->
+<div id="inactive-player" style="display: <%= @playing_user != current_user ? "initial" : "none" %>;">
   <p><span id="who-is-playing"></span> is playing</p>
   <!-- TIMER -->
-  <p>Seconds left: <span id="seconds-left">---</span></p>
-  <h1><span class="js-timeout">60</span></h1>
+  <h1><span id="seconds-left">60</span></h1>
 
   <!-- sCORES for each team -->
   <p>Score team 1<span id="team-1-points"></span></p>
@@ -31,8 +31,9 @@
   <!-- BUZZER -->
   <%= audio_tag "buzzer.wav", class: "audio-play" %>
   <button class="buttons join-button audioButton" type="button" id="buzz_sound">Buzzer</button>
-  <audio id="rock-on" src="buzzer.wav"></audio>
-<% end %>
+  <%# <audio id="rock-on" src="/buzzer.wav"></audio> %>
+</div>
+
 
 
 <!-- jAVASCRIPT PACK TAGS -->

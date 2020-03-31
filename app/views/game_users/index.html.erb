@@ -13,7 +13,11 @@
     </div>
     <!-- loop over users of team 1 -->
     <div class="card-team">
-      <ul id="team-1-players"></ul>
+      <ul id="team-1-players">
+        <% @game.game_teams.first.game_users.each do |game_user| %>
+          <li><%= game_user.user.name %></li>
+        <% end %>
+      </ul>
     </div>
   </div>
   <div class="card-team-player"> <!-- card for team 2 -->
@@ -23,7 +27,11 @@
     </div>
     <!-- loop over users of team 2 -->
     <div class="card-team">
-      <ul id="team-2-players"></ul>
+      <ul id="team-2-players">
+        <% @game.game_teams.last.game_users.each do |game_user| %>
+          <li><%= game_user.user.name %></li>
+        <% end %>
+      </ul>
     </div>
   </div>
 </div>

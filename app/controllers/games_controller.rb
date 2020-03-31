@@ -4,6 +4,7 @@ class GamesController < ApplicationController
     @game = Game.new
     @game_user = GameUser.new
   end
+
   def create
     @game = Game.new(user: current_user)
     if @game.save
@@ -19,6 +20,8 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
+    @playing_user = @game.game_users.joins(:game_team).find_by(active: true, game_teams: { active: true }).user
+
     respond_to do |format|
       # if the browser requested HTML then render HTML response -> app/views/games/show.html.erb
       format.html do
@@ -28,13 +31,11 @@ class GamesController < ApplicationController
       end
       # if the browser requested JSON then send back JSON
       format.json do
-        # game_current_user = User.find(@game.current_user)
-        # current_word  = @game.game_words.find_by(status: :in)
         team_1_score = @game.game_teams.first.score
         team_2_score = @game.game_teams.last.score
         round_now = @game.round
-        who_play = @game.game_users.find_by(active: true).user.name
-        playing_now =  @game.game_users.find_by(active: true).user == current_user
+        who_play = @playing_user.name
+        playing_now = @playing_user == current_user
         team_playing = @game.game_teams.find_by(active: true).id
 
         render json: {
@@ -42,7 +43,7 @@ class GamesController < ApplicationController
           team_playing: team_playing,
           who_is_playing: who_play,
           you_are_playing: playing_now,
-          seconds_left: "",
+          seconds_left: @game.seconds_left,
           team_1_points: team_1_score,
           team_2_points: team_2_score,
           round_name: round_now

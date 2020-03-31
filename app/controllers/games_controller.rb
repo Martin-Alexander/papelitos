@@ -6,7 +6,7 @@ class GamesController < ApplicationController
   end
 
   def create
-    @game = Game.new(user: current_user)
+    @game = Game.new(user: current_user, seconds_left: 100)
     if @game.save
       @game_user = GameUser.new(user: current_user, game: @game, active: true) # host will be the first to play
       hosts_team = GameTeam.create!(game: @game, score: 0, active: true) # host's team stats

@@ -7,9 +7,10 @@ class GamesController < ApplicationController
   def create
     @game = Game.new(user: current_user)
     if @game.save
-      @game_user = GameUser.new(user: current_user, game: @game) # assign current user to game
-      2.times { GameTeam.create!(game: @game, score: 0) } # create 2 teams associated to this game
-      @game_user.game_team = @game.game_teams.first
+      @game_user = GameUser.new(user: current_user, game: @game, active: true) # host will be the first to play
+      hosts_team = GameTeam.create!(game: @game, score: 0, active: true) # host's team stats
+      other_team = GameTeam.create!(game: @game, score: 0)
+      @game_user.game_team = hosts_team
       if @game_user.save
         redirect_to new_game_game_word_path(@game.id)
       end
@@ -32,9 +33,9 @@ class GamesController < ApplicationController
         team_1_score = @game.game_teams.first.score
         team_2_score = @game.game_teams.last.score
         round_now = @game.round
-        who_play = @game.game_users.first.user.name
-        playing_now = @game.game_users.first.user.name
-        team_playing = @game.game_users.first.game_team_id
+        who_play = @game.game_users.find_by(active: true).user.name
+        playing_now =  @game.game_users.find_by(active: true).user == current_user
+        team_playing = @game.game_teams.find_by(active: true).id
 
         render json: {
           # current_word: current_word.name,

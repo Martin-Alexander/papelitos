@@ -30,6 +30,11 @@ class GameUsersController < ApplicationController
     else
       @game_user.game_team = @game.game_teams.second
     end
+
+    if @game_user.game_team.game_users.count == 1
+      @game_user.active = true
+    end
+
     if @game_user.save
       redirect_to new_game_game_word_path(@game.id)
     else
